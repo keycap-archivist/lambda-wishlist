@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    // "strict": true,
+    "target": "es2018",
+    "module": "commonjs",
+    "removeComments": true,
+    "sourceMap": true,
+    "newLine": "lf",
+    "esModuleInterop": true,
+    "baseUrl": "./src",
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "paths": {
+      "#app/*": ["*"]
+    },
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "lib": ["ES2018"]
+  },
+  "include": ["./src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
