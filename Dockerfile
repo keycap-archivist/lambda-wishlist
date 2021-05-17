@@ -33,5 +33,5 @@ RUN yarn add aws-lambda-ric
 
 
 ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
-CMD ["app.handler"]
+CMD ["lambda.handler"]
 

@@ -9,30 +9,36 @@
     "prettier:write": "prettier -c \"./src/**/*.ts\" --write",
     "lint": "yarn eslint && yarn prettier",
     "watch:serve": "nodemon -e yaml,ts,gql -w ./src --exec \"npm run build && npm run serve\"",
-    "serve": "node --inspect -r source-map-support/register -r dotenv/config dist/server.js",
-    "watch:inspect": "nodemon --inspect -e yaml,ts,gql -w ./src -x node -r ts-node/register src/server.ts",
-    "build": "npx tsc --incremental ",
+    "serve": "node --inspect -r source-map-support/register -r dotenv/config dist/app.js",
+    "watch:inspect": "nodemon --inspect -e yaml,ts,gql -w ./src -x node -r ts-node/register src/app.ts",
+    "build": "npx tsc --incremental && cp -R src/assets/ dist/assets/",
     "clean": "rm -rf dist"
   },
   "author": "Vincent LE GOFF",
   "license": "MIT",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.16.0",
+    "aws-lambda-fastify": "^1.4.4",
+    "axios": "^0.21.1",
     "canvas": "2.7.0",
-    "lodash": "4.17.21",
+    "fastify": "^3.15.1",
+    "fastify-cors": "^6.0.1",
+    "lodash": "^4.17.21",
     "tablemark": "2.0.0",
-    "uuid": "8.3.2"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/node": "14.14.41",
     "@typescript-eslint/eslint-plugin": "4.22.0",
     "@typescript-eslint/parser": "4.22.0",
-    "dotenv": "8.2.0",
+    "dotenv": "^9.0.2",
     "eslint": "7.24.0",
     "eslint-config-prettier": "8.2.0",
     "eslint-plugin-prettier": "3.4.0",
     "nodemon": "2.0.7",
     "npm-check-updates": "11.5.1",
     "prettier": "2.2.1",
+    "source-map-support": "^0.5.19",
     "typescript": "4.2.4"
   }
 }
