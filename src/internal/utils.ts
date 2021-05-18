@@ -50,10 +50,19 @@ import { S3 } from '@aws-sdk/client-s3';
 
 const client = new S3({ region: 'us-east-2' });
 
+const NS_PER_SEC = 1e9;
+
+export function readableHRTime(diff: [number, number]): string {
+  return `${(diff[0] * NS_PER_SEC + diff[1]) / 1000000} ms`;
+}
+
 export async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
+  const timeLoad = process.hrtime();
   const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
-  const buffer = await readableToBuffer(data.Body as any);
-  return await resizeImg(buffer);
+  const diffLoad = process.hrtime(timeLoad);
+  const out = await readableToBuffer(data.Body as any);
+  console.log(`getImgBuffer ${colorway.id} ${readableHRTime(diffLoad)}`);
+  return out;
 }
 
 export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {

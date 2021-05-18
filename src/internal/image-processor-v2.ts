@@ -2,7 +2,7 @@ import { createCanvas, loadImage } from 'canvas';
 import { merge, cloneDeep } from 'lodash';
 
 import { instance, ColorwayDetailed } from '../db/instance';
-import { getImgBuffer, fitText, isTextFittingSpace, drawBorder, assetsBuffer } from './utils';
+import { getImgBuffer, fitText, isTextFittingSpace, drawBorder, assetsBuffer, readableHRTime } from './utils';
 
 import type { Image, CanvasRenderingContext2D } from 'canvas';
 
@@ -78,7 +78,6 @@ const THUMB_RADIUS = 10;
 const IMG_WIDTH = 250;
 const IMG_HEIGTH = IMG_WIDTH;
 const rowHeight = IMG_HEIGTH + MARGIN_BOTTOM;
-const NS_PER_SEC = 1e9;
 
 let redditLogo: Image, discordLogo: Image, kaLogo: Image;
 let isWarm = false;
@@ -97,8 +96,10 @@ async function drawTheCap(
   x: number,
   y: number
 ): Promise<void> {
+  const timeOverall = process.hrtime();
   const imgBuffer = await getImgBuffer(cap);
   const _img = await loadImage(imgBuffer);
+
   let h: number, w: number, sx: number, sy: number;
   if (_img.width > _img.height) {
     h = _img.height;
@@ -170,6 +171,8 @@ async function drawTheCap(
       context.fillText(legend, x + IMG_WIDTH / 2, y + IMG_HEIGTH + LINE_HEIGHT);
     }
   }
+  const diff = process.hrtime(timeOverall);
+  console.log(`Draw cap ${cap.id} ${readableHRTime(diff)}`);
 }
 
 function calcWidth(capsPerline: number): number {
@@ -344,8 +347,8 @@ export async function generateWishlist(appLogger: any, w: wishlistV2): Promise<B
     ctx.fillText('Priorities', MARGIN_SIDE, 30);
   }
 
-  const outBuffer = canvas.toBuffer('image/png');
+  const outBuffer = canvas.toBuffer('image/jpeg', { quality: 0.9, progressive: true });
   const diff = process.hrtime(time);
-  appLogger.info(`generateWishlist-v2 ${w.caps.length} caps ${(diff[0] * NS_PER_SEC + diff[1]) / 1000000} ms`);
+  appLogger.info(`generateWishlist-v2 ${w.caps.length} caps ${readableHRTime(diff)}`);
   return outBuffer;
 }
