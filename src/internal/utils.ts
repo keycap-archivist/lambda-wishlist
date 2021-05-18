@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs';
-import { createCanvas, loadImage, registerFont } from 'canvas';
+import { createCanvas, loadImage } from 'canvas';
 import { join, resolve } from 'path';
 import type { ColorwayDetailed } from '../db/instance';
 
@@ -162,7 +162,7 @@ export async function readableToString(readable: NodeJS.ReadableStream): Promise
 
 export async function readableToBuffer(readable: NodeJS.ReadableStream): Promise<Buffer> {
   const chunks = [];
-  for await (let chunk of readable) {
+  for await (const chunk of readable) {
     chunks.push(chunk);
   }
   return Buffer.concat(chunks);

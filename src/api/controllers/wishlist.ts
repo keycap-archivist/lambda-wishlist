@@ -7,7 +7,7 @@ import { generateWishlist } from '../../internal/image-processor-v2';
 
 // import type { ColorwayDetailed } from '#app/db/instance';
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import type { wishlistCap, wishlistV2 } from '../../internal/image-processor-v2';
+import type { wishlistV2 } from '../../internal/image-processor-v2';
 
 export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): Promise<void> => {
   try {
