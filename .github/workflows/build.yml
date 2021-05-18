@@ -26,8 +26,13 @@ jobs:
         run: yarn
       - name: lint
         run: yarn lint
-      # - run: |
-      #   docker build .
-      #   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.us-east-1.amazonaws.com
-      #   docker tag  hello-world:latest 123456789012.dkr.ecr.us-east-1.amazonaws.com/hello-world:latest
-      #   docker push 123456789012.dkr.ecr.us-east-1.amazonaws.com/hello-world:latest
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - run: |
+        docker build -t lambda_wishlist:latest .
+        aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 988455245074.dkr.ecr.us-east-2.amazonaws.com
+        docker tag lambda_wishlist:latest 988455245074.dkr.ecr.us-east-2.amazonaws.com/stable/lambda_wishlist:latest
+        docker push 988455245074.dkr.ecr.us-east-2.amazonaws.com/stable/lambda_wishlist:latest
