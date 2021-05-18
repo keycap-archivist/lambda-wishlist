@@ -1,8 +1,6 @@
 import { readFileSync } from 'fs';
 import { createCanvas, loadImage, registerFont } from 'canvas';
 import { join, resolve } from 'path';
-// import { writeFile } from 'fs/promises';
-import axios from 'axios';
 import type { ColorwayDetailed } from '../db/instance';
 
 // export const cachePath = resolve(join(__dirname, '..', '..', 'img-cache'));
@@ -48,17 +46,14 @@ export const assetsBuffer = {
 //   }
 //   return output;
 // }
+import { S3 } from '@aws-sdk/client-s3';
+
+const client = new S3({ region: 'us-east-2' });
 
 export async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
-  let output: Buffer;
-
-  const { data } = await axios.request({
-    method: 'GET',
-    responseType: 'arraybuffer',
-    url: `https://cdn.keycap-archivist.com/keycaps/250/${colorway.id}.jpg`
-  });
-  output = await resizeImg(data);
-  return output;
+  const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
+  const buffer = await readableToBuffer(data.Body as any);
+  return await resizeImg(buffer);
 }
 
 export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {
@@ -163,4 +158,12 @@ export async function readableToString(readable: NodeJS.ReadableStream): Promise
     result += chunk;
   }
   return result;
+}
+
+export async function readableToBuffer(readable: NodeJS.ReadableStream): Promise<Buffer> {
+  const chunks = [];
+  for await (let chunk of readable) {
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
 }

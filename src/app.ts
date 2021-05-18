@@ -9,9 +9,11 @@ const app = fastify({ logger: true });
 
 buildSchemas(app);
 app.register(fastifyCORS, { origin: true, methods: 'GET,POST' });
-
+app.register(async () => {
+  await instance.init();
+});
 app.get('/', {}, (_, reply) => {
-  reply.send({ hello: 'world' });
+  reply.send({ keycap: 'archivist' });
 });
 
 app.route({
@@ -21,9 +23,6 @@ app.route({
     body: {
       $ref: '#wishlist'
     }
-  },
-  preHandler: async () => {
-    await instance.init();
   },
   handler: postWishlist
 });
