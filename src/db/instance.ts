@@ -51,7 +51,7 @@ class CatalogDB {
       console.info('Db already in memory, skipping');
       return;
     }
-    console.log('Downloading db')
+    console.log('Downloading db');
     const s = process.hrtime();
     const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: 'db/catalog.json' });
     const str = await readableToString(data.Body as any);
