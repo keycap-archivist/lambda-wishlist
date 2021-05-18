@@ -35,5 +35,5 @@ jobs:
       - run: |
           docker build -t lambda_wishlist:latest .
           aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 988455245074.dkr.ecr.us-east-2.amazonaws.com
-          docker tag lambda_wishlist:latest 988455245074.dkr.ecr.us-east-2.amazonaws.com/stable:latest
-          docker push 988455245074.dkr.ecr.us-east-2.amazonaws.com/stable:latest
+          docker tag lambda_wishlist:latest 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
+          docker push 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
