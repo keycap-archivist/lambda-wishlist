@@ -1,4 +1,5 @@
 ARG FUNCTION_DIR="/function"
+ARG GIT_REV
 
 FROM node:14.15.1-slim as build-img
 
@@ -25,7 +26,7 @@ RUN apt-get install -y \
     libcurl4-openssl-dev
 
 WORKDIR ${FUNCTION_DIR}
-
+ENV GIT_REV="${GIT_REV}"
 COPY --from=build-img /src/dist ${FUNCTION_DIR}
 COPY --from=build-img /src/package.json ${FUNCTION_DIR}/package.json
 RUN yarn --production=true
