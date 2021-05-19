@@ -16,7 +16,7 @@ app.register(async () => {
   await instance.init();
 });
 app.get('/', {}, (_, reply) => {
-  reply.send({ keycap: 'archivist', revision: GIT_REV });
+  reply.send({ keycap: 'archivist', fku: 'nav', revision: GIT_REV });
 });
 
 app.route({
