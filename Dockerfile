@@ -26,7 +26,7 @@ RUN apt-get install -y \
     libcurl4-openssl-dev
 
 WORKDIR ${FUNCTION_DIR}
-ENV GIT_REV="${GIT_REV}"
+ENV GIT_REVISION="${GIT_REV}"
 COPY --from=build-img /src/dist ${FUNCTION_DIR}
 COPY --from=build-img /src/package.json ${FUNCTION_DIR}/package.json
 RUN yarn --production=true
