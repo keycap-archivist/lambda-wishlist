@@ -2,21 +2,24 @@ import fastify from 'fastify';
 import fastifyCORS from 'fastify-cors';
 import pino from 'pino';
 
-import { postWishlist } from './api/controllers/wishlist';
+import { postWishlist, getWishlistSettings } from './api/controllers/wishlist';
 import { instance } from './db/instance';
 import { build as buildSchemas } from './internal/schemas';
+import { initImgProcessor } from './internal/image-processor-v2';
 
 const GIT_REV = process.env.GIT_REVISION;
 const logger = pino().child({ revision: GIT_REV });
-const app = fastify({ logger });
+const app = fastify({ logger, exposeHeadRoutes: true });
 
 buildSchemas(app);
 app.register(fastifyCORS, { origin: true, methods: 'GET,POST' });
 app.register(async () => {
+  initImgProcessor();
   await instance.init();
 });
+
 app.get('/wishlist/info', {}, (_, reply) => {
-  reply.send({ keycap: 'archivist', fku: 'nav', revision: GIT_REV });
+  reply.send({ keycap: 'archivist', revision: GIT_REV });
 });
 
 app.route({
@@ -28,6 +31,12 @@ app.route({
     }
   },
   handler: postWishlist
+});
+
+app.route({
+  method: 'GET',
+  url: '/wishlist/settings',
+  handler: getWishlistSettings
 });
 
 if (require.main === module) {

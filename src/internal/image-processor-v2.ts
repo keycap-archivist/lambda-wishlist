@@ -1,10 +1,17 @@
-import { createCanvas, loadImage } from 'canvas';
+import { createCanvas, loadImage, registerFont } from 'canvas';
 import { merge, cloneDeep } from 'lodash';
+import { readFileSync, readdirSync } from 'fs';
+import { join, resolve } from 'path';
+import { S3 } from '@aws-sdk/client-s3';
 
-import { instance, ColorwayDetailed } from '../db/instance';
-import { getImgBuffer, fitText, isTextFittingSpace, drawBorder, assetsBuffer, readableHRTime } from './utils';
+import { instance } from '../db/instance';
+import { readableHRTime, readableToBuffer } from '../internal/utils';
 
+import type { ColorwayDetailed } from '../db/instance';
 import type { Image, CanvasRenderingContext2D } from 'canvas';
+
+export const supportedFonts = [];
+const client = new S3({ region: 'us-east-2' });
 
 export interface cap {
   id: string;
@@ -351,4 +358,90 @@ export async function generateWishlist(appLogger: any, w: wishlistV2): Promise<B
   const diff = process.hrtime(time);
   appLogger.info(`generateWishlist-v2 ${w.caps.length} caps ${readableHRTime(diff)}`);
   return outBuffer;
+}
+
+const assetsBuffer = {
+  discordLogo: readFileSync(resolve(join(__dirname, '..', 'assets', 'img', 'discord_logo.png'))),
+  redditLogo: readFileSync(resolve(join(__dirname, '..', 'assets', 'img', 'reddit_logo.png'))),
+  kaLogo: readFileSync(resolve(join(__dirname, '..', 'assets', 'img', 'ka_logo.png')))
+};
+
+export function initImgProcessor(): void {
+  console.log('initImgProcessor');
+  const fontPath = resolve(join(__dirname, '..', 'assets', 'fonts'));
+  for (const f of readdirSync(fontPath)) {
+    const family = f.split('.')[0].split('-')[0];
+    registerFont(join(fontPath, f), { family });
+    supportedFonts.push(family);
+  }
+  console.log('initImgProcessor end');
+}
+
+async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
+  const timeLoad = process.hrtime();
+  const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
+  const diffLoad = process.hrtime(timeLoad);
+  const out = await readableToBuffer(data.Body as any);
+  console.log(`getImgBuffer ${colorway.id} ${readableHRTime(diffLoad)}`);
+  return out;
+}
+
+export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {
+  const IMG_HEIGTH = 500;
+  const IMG_WIDTH = 500;
+  const _img = await loadImage(imgBuffer);
+
+  let h: number, w: number, sx: number, sy: number;
+  if (_img.width > _img.height) {
+    h = _img.height;
+    w = h;
+    sy = 0;
+    sx = Math.ceil((_img.width - _img.height) / 2);
+  } else {
+    sx = 0;
+    sy = Math.ceil((_img.height - _img.width) / 2);
+    w = _img.width;
+    h = w;
+  }
+  const Tcanvas = createCanvas(IMG_WIDTH, IMG_HEIGTH);
+  const Tctx = Tcanvas.getContext('2d');
+
+  Tctx.drawImage(_img, sx, sy, w, h, 0, 0, IMG_WIDTH, IMG_HEIGTH);
+
+  return Tcanvas.toBuffer('image/jpeg', { quality: 1, progressive: true, chromaSubsampling: false });
+}
+
+export function isTextFittingSpace(
+  ctx: CanvasRenderingContext2D,
+  legend: string,
+  maxWidth: number,
+  margin = 10
+): boolean {
+  const measurement = ctx.measureText(legend);
+  if (measurement.width > maxWidth - margin) {
+    return false;
+  }
+  return true;
+}
+
+export function fitText(ctx: CanvasRenderingContext2D, legend: string, maxWidth: number): string {
+  let outLegend = legend.trim();
+  if (isTextFittingSpace(ctx, outLegend, maxWidth)) {
+    return outLegend;
+  }
+  while (!isTextFittingSpace(ctx, `${outLegend}...`, maxWidth)) {
+    outLegend = outLegend.trim().slice(0, -1);
+  }
+  return `${outLegend.trim()}...`;
+}
+
+export function drawBorder(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  thickness = 1,
+  color = '#F00'
+): void {
+  ctx.fillStyle = color;
+  ctx.fillRect(0 - thickness, 0 - thickness, width + thickness * 2, height + thickness * 2);
 }
