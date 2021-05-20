@@ -11,6 +11,7 @@ RUN yarn build
 FROM node:14.15.1-buster
 
 ARG FUNCTION_DIR
+ARG GIT_REV
 RUN apt-get update
 RUN apt-get install -y \
     build-essential \
@@ -26,7 +27,7 @@ RUN apt-get install -y \
     libcurl4-openssl-dev
 
 WORKDIR ${FUNCTION_DIR}
-ENV GIT_REVISION="${GIT_REV}"
+ENV GIT_REVISION=${GIT_REV}
 COPY --from=build-img /src/dist ${FUNCTION_DIR}
 COPY --from=build-img /src/package.json ${FUNCTION_DIR}/package.json
 RUN yarn --production=true

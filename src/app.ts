@@ -15,13 +15,13 @@ app.register(fastifyCORS, { origin: true, methods: 'GET,POST' });
 app.register(async () => {
   await instance.init();
 });
-app.get('/', {}, (_, reply) => {
+app.get('/wishlist/info', {}, (_, reply) => {
   reply.send({ keycap: 'archivist', fku: 'nav', revision: GIT_REV });
 });
 
 app.route({
   method: 'POST',
-  url: '/wishlist',
+  url: '/wishlist/generate',
   schema: {
     body: {
       $ref: '#wishlist'
