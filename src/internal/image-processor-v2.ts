@@ -103,7 +103,6 @@ async function drawTheCap(
   x: number,
   y: number
 ): Promise<void> {
-  const timeOverall = process.hrtime();
   const imgBuffer = await getImgBuffer(cap);
   const _img = await loadImage(imgBuffer);
 
@@ -178,8 +177,6 @@ async function drawTheCap(
       context.fillText(legend, x + IMG_WIDTH / 2, y + IMG_HEIGTH + LINE_HEIGHT);
     }
   }
-  const diff = process.hrtime(timeOverall);
-  console.log(`Draw cap ${cap.id} ${readableHRTime(diff)}`);
 }
 
 function calcWidth(capsPerline: number): number {
@@ -378,11 +375,8 @@ export function initImgProcessor(): void {
 }
 
 async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
-  const timeLoad = process.hrtime();
   const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
-  const diffLoad = process.hrtime(timeLoad);
   const out = await readableToBuffer(data.Body as any);
-  console.log(`getImgBuffer ${colorway.id} ${readableHRTime(diffLoad)}`);
   return out;
 }
 
