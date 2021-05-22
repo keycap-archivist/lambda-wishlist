@@ -8,13 +8,13 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
     const imgBuffer = await generateWishlist(req.log, req.body);
     if (imgBuffer) {
       return resp.send({
-        statusCode: 200,
-        headers: {
+        StatusCode: 200,
+        Headers: {
           'content-disposition': `attachment; filename="wishlist.png"`,
           'content-type': `image/png`
         },
-        isBase64Encoded: true,
-        body: imgBuffer.toString('base64')
+        IsBase64Encoded: true,
+        Body: imgBuffer.toString('base64')
       });
     }
 
