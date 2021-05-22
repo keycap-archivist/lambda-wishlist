@@ -2,7 +2,7 @@ import fastify from 'fastify';
 import fastifyCORS from 'fastify-cors';
 import pino from 'pino';
 
-import { postWishlist, getWishlistSettings, postWishlist2 } from './api/controllers/wishlist';
+import { postWishlist, getWishlistSettings } from './api/controllers/wishlist';
 import { instance } from './db/instance';
 import { build as buildSchemas } from './internal/schemas';
 import { initImgProcessor } from './internal/image-processor-v2';
@@ -31,17 +31,6 @@ app.route({
     }
   },
   handler: postWishlist
-});
-
-app.route({
-  method: 'POST',
-  url: '/wishlist/generatev2',
-  schema: {
-    body: {
-      $ref: '#wishlist'
-    }
-  },
-  handler: postWishlist2
 });
 
 app.route({
