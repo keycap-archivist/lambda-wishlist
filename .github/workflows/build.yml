@@ -32,8 +32,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
-      - run: |
-          docker build --build-arg GIT_REV=${{ github.sha }} -t lambda_wishlist:latest .
+      - name: Build Docker Image
+        run: docker build --build-arg GIT_REV=${{ github.sha }} -t lambda_wishlist:latest .
+      - name: Push to ECR
+        run: |
           aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 988455245074.dkr.ecr.us-east-2.amazonaws.com
           docker tag lambda_wishlist:latest 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
           docker push 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
+      - name: Deploy Lambda function
+        run: aws lambda publish-version --function-name wishlist
