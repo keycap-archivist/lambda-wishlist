@@ -40,4 +40,8 @@ jobs:
           docker tag lambda_wishlist:latest 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
           docker push 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest
       - name: Deploy Lambda function
-        run: aws lambda publish-version --function-name wishlist
+        run: |
+          aws lambda update-function-code \
+            --function-name wishlist \
+            --image-uri 988455245074.dkr.ecr.us-east-2.amazonaws.com/lambda_wishlist:latest \
+            --publish
