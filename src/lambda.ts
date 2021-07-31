@@ -1,6 +1,6 @@
 import awsLambdaFastify from 'aws-lambda-fastify';
 import app from './app';
 
-const proxy = awsLambdaFastify(app);
+const proxy = awsLambdaFastify(app, { binaryMimeTypes: ['image/png'] });
 
 module.exports.handler = proxy;

@@ -7,15 +7,23 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
   try {
     const imgBuffer = await generateWishlist(req.log, req.body);
     if (imgBuffer) {
-      return resp.send({
-        StatusCode: 200,
-        Headers: {
-          'Content-Disposition': `attachment; filename="wishlist.png"`,
-          'Content-Type': `image/png`
-        },
-        IsBase64Encoded: true,
-        Body: imgBuffer.toString('base64')
-      });
+      if (req.headers.accept.includes('image/png')) {
+        return resp
+          .status(200)
+          .header('Content-Disposition', 'attachment; filename="wishlist.png"')
+          .header('Content-Type', 'image/png')
+          .send(imgBuffer);
+      } else {
+        return resp.send({
+          StatusCode: 200,
+          Headers: {
+            'Content-Disposition': `attachment; filename="wishlist.png"`,
+            'Content-Type': `image/png`
+          },
+          IsBase64Encoded: true,
+          Body: imgBuffer.toString('base64')
+        });
+      }
     }
 
     return resp.status(500).send('Oops! An error has occured');
