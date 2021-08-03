@@ -5,10 +5,11 @@ import { join, resolve } from 'path';
 import { S3 } from '@aws-sdk/client-s3';
 
 import { instance } from '../db/instance';
-import { readableHRTime, readableToBuffer } from '../internal/utils';
+import { readableHRTimeMs, readableToBuffer } from '../internal/utils';
 
 import type { ColorwayDetailed } from '../db/instance';
 import type { Image, CanvasRenderingContext2D } from 'canvas';
+import type { FastifyLoggerInstance } from 'fastify';
 
 export const supportedFonts = [];
 const client = new S3({ region: 'us-east-2' });
@@ -21,6 +22,13 @@ export interface cap {
 
 export interface wishlistCap extends cap {
   isPriority?: boolean;
+}
+
+export interface wishlistResult {
+  isError: boolean;
+  result?: Buffer;
+  metrics?: Record<string, number>;
+  time?: number;
 }
 
 interface textCustomization {
@@ -90,9 +98,23 @@ let redditLogo: Image, discordLogo: Image, kaLogo: Image;
 let isWarm = false;
 
 async function warmUp() {
-  redditLogo = await loadImage(assetsBuffer.redditLogo);
-  discordLogo = await loadImage(assetsBuffer.discordLogo);
-  kaLogo = await loadImage(assetsBuffer.kaLogo);
+  const p = [];
+  p.push(
+    loadImage(assetsBuffer.redditLogo).then((d) => {
+      redditLogo = d;
+    })
+  );
+  p.push(
+    loadImage(assetsBuffer.discordLogo).then((d) => {
+      discordLogo = d;
+    })
+  );
+  p.push(
+    loadImage(assetsBuffer.kaLogo).then((d) => {
+      kaLogo = d;
+    })
+  );
+  await Promise.all(p);
   isWarm = true;
 }
 
@@ -180,7 +202,7 @@ async function drawTheCap(
 }
 
 function calcWidth(capsPerline: number): number {
-  return capsPerline * IMG_WIDTH + capsPerline * MARGIN_SIDE + MARGIN_SIDE;
+  return capsPerline * IMG_WIDTH + capsPerline * (MARGIN_SIDE * 2);
 }
 
 function calcHeight(w: sanitizedWishlist): number {
@@ -217,7 +239,7 @@ function calcHeight(w: sanitizedWishlist): number {
   return out;
 }
 
-export async function generateWishlist(appLogger: any, w: wishlistV2): Promise<Buffer | null> {
+export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wishlistV2): Promise<wishlistResult> {
   if (!isWarm) {
     await warmUp();
   }
@@ -235,8 +257,8 @@ export async function generateWishlist(appLogger: any, w: wishlistV2): Promise<B
 
   // If no caps founds means that ids are wrong and wishlist can't be generated
   if (!w.caps.length) {
-    appLogger.error('No caps found for the wishlist.');
-    return null;
+    appLogger.error('No caps found for the wishlist');
+    return { isError: true };
   }
 
   w.tradeCaps = w.tradeCaps
@@ -353,8 +375,9 @@ export async function generateWishlist(appLogger: any, w: wishlistV2): Promise<B
 
   const outBuffer = canvas.toBuffer('image/jpeg', { quality: 0.9, progressive: true });
   const diff = process.hrtime(time);
-  appLogger.info(`generateWishlist-v2 ${w.caps.length} caps ${readableHRTime(diff)}`);
-  return outBuffer;
+  const duration = readableHRTimeMs(diff);
+  appLogger.info(`generateWishlist-v2 %d caps %d ms`, w.caps.length, duration);
+  return { result: outBuffer, isError: false, time: duration, metrics: {} };
 }
 
 const assetsBuffer = {
@@ -364,14 +387,12 @@ const assetsBuffer = {
 };
 
 export function initImgProcessor(): void {
-  console.log('initImgProcessor');
   const fontPath = resolve(join(__dirname, '..', 'assets', 'fonts'));
   for (const f of readdirSync(fontPath)) {
     const family = f.split('.')[0].split('-')[0];
     registerFont(join(fontPath, f), { family });
     supportedFonts.push(family);
   }
-  console.log('initImgProcessor end');
 }
 
 async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
@@ -380,30 +401,30 @@ async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
   return out;
 }
 
-export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {
-  const IMG_HEIGTH = 500;
-  const IMG_WIDTH = 500;
-  const _img = await loadImage(imgBuffer);
+// export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {
+//   const IMG_HEIGTH = 500;
+//   const IMG_WIDTH = 500;
+//   const _img = await loadImage(imgBuffer);
 
-  let h: number, w: number, sx: number, sy: number;
-  if (_img.width > _img.height) {
-    h = _img.height;
-    w = h;
-    sy = 0;
-    sx = Math.ceil((_img.width - _img.height) / 2);
-  } else {
-    sx = 0;
-    sy = Math.ceil((_img.height - _img.width) / 2);
-    w = _img.width;
-    h = w;
-  }
-  const Tcanvas = createCanvas(IMG_WIDTH, IMG_HEIGTH);
-  const Tctx = Tcanvas.getContext('2d');
+//   let h: number, w: number, sx: number, sy: number;
+//   if (_img.width > _img.height) {
+//     h = _img.height;
+//     w = h;
+//     sy = 0;
+//     sx = Math.ceil((_img.width - _img.height) / 2);
+//   } else {
+//     sx = 0;
+//     sy = Math.ceil((_img.height - _img.width) / 2);
+//     w = _img.width;
+//     h = w;
+//   }
+//   const Tcanvas = createCanvas(IMG_WIDTH, IMG_HEIGTH);
+//   const Tctx = Tcanvas.getContext('2d');
 
-  Tctx.drawImage(_img, sx, sy, w, h, 0, 0, IMG_WIDTH, IMG_HEIGTH);
+//   Tctx.drawImage(_img, sx, sy, w, h, 0, 0, IMG_WIDTH, IMG_HEIGTH);
 
-  return Tcanvas.toBuffer('image/jpeg', { quality: 1, progressive: true, chromaSubsampling: false });
-}
+//   return Tcanvas.toBuffer('image/jpeg', { quality: 1, progressive: true, chromaSubsampling: false });
+// }
 
 export function isTextFittingSpace(
   ctx: CanvasRenderingContext2D,

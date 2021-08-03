@@ -9,7 +9,7 @@ import { initImgProcessor } from './internal/image-processor-v2';
 
 const GIT_REV = process.env.GIT_REVISION;
 const logger = pino().child({ revision: GIT_REV });
-const app = fastify({ logger, exposeHeadRoutes: true });
+const app = fastify({ logger, exposeHeadRoutes: true, pluginTimeout: 20000 });
 
 buildSchemas(app);
 app.register(fastifyCORS, { origin: true, methods: 'GET,POST' });

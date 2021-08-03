@@ -6,22 +6,22 @@ import type { wishlistV2 } from '../../internal/image-processor-v2';
 export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): Promise<void> => {
   try {
     const imgBuffer = await generateWishlist(req.log, req.body);
-    if (imgBuffer) {
+    if (!imgBuffer.isError) {
       if (req.headers.accept.includes('image/png')) {
         return resp
           .status(200)
           .header('Content-Disposition', 'attachment; filename="wishlist.png"')
           .header('Content-Type', 'image/png')
-          .send(imgBuffer);
+          .send(imgBuffer.result);
       } else {
-        return resp.send({
+        return resp.status(200).send({
           StatusCode: 200,
           Headers: {
             'Content-Disposition': `attachment; filename="wishlist.png"`,
             'Content-Type': `image/png`
           },
           IsBase64Encoded: true,
-          Body: imgBuffer.toString('base64')
+          Body: imgBuffer.result.toString('base64')
         });
       }
     }

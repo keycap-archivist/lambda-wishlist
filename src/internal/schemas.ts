@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify';
 
-export function build(app: FastifyInstance) {
+export function build(app: FastifyInstance): void {
   app.addSchema({
     $id: '#textCustomization',
     type: 'object',
