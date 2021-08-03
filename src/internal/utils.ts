@@ -1,7 +1,7 @@
 const NS_PER_SEC = 1e9;
 
-export function readableHRTime(diff: [number, number]): string {
-  return `${(diff[0] * NS_PER_SEC + diff[1]) / 1000000} ms`;
+export function readableHRTimeMs(diff: [number, number]): number {
+  return (diff[0] * NS_PER_SEC + diff[1]) / 1000000;
 }
 
 export async function readableToString(readable: NodeJS.ReadableStream): Promise<string> {
