@@ -1,4 +1,5 @@
 import { generateWishlist, supportedFonts } from '../../internal/image-processor-v2';
+import { instance } from '../../db/instance';
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { wishlistV2 } from '../../internal/image-processor-v2';
@@ -35,4 +36,31 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
 
 export const getWishlistSettings = async (_: FastifyRequest, resp: FastifyReply): Promise<void> => {
   return resp.type('application/json').status(200).send({ fonts: supportedFonts });
+};
+
+export const checkWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): Promise<void> => {
+  try {
+    const result = {
+      hasError: false,
+      errors: []
+    };
+    for (const c of req.body.caps) {
+      if (instance.getColorway(c.id) === undefined) {
+        result.hasError = true;
+        result.errors.push(c.id);
+      }
+    }
+    if (req.body.tradeCaps) {
+      for (const c of req.body.tradeCaps) {
+        if (instance.getColorway(c.id) === undefined) {
+          result.hasError = true;
+          result.errors.push(c.id);
+        }
+      }
+    }
+    return resp.status(200).send(result);
+  } catch (e) {
+    req.log.error(e);
+    return resp.status(500).send('Oops! An error has occured');
+  }
 };
