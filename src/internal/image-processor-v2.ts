@@ -397,7 +397,7 @@ export function initImgProcessor(): void {
 
 async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
   const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
-  const out = await readableToBuffer(data.Body as any);
+  const out = await readableToBuffer(data.Body as NodeJS.ReadableStream);
   return out;
 }
 

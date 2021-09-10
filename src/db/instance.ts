@@ -54,7 +54,7 @@ class CatalogDB {
     console.log('Downloading db');
     const s = process.hrtime();
     const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: 'db/catalog.json' });
-    const str = await readableToString(data.Body as any);
+    const str = await readableToString(data.Body as NodeJS.ReadableStream);
     this.db = this.format(JSON.parse(str), 'AMAZON');
     const hrend = process.hrtime(s);
     console.info('Load DB (hr): %ds %dms', hrend[0], hrend[1] / 1000000);
