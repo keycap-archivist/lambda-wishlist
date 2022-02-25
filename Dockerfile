@@ -1,14 +1,14 @@
 ARG FUNCTION_DIR="/function"
 ARG GIT_REV
 
-FROM node:14.15.1-slim as build-img
+FROM node:16.14.0-slim as build-img
 
 COPY ./ /src
 WORKDIR /src
 RUN yarn
 RUN yarn build
 
-FROM node:14.15.1-buster
+FROM node:16.14.0-buster
 
 ARG FUNCTION_DIR
 ARG GIT_REV

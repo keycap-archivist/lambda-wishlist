@@ -13,9 +13,9 @@ export async function readableToString(readable: NodeJS.ReadableStream): Promise
 }
 
 export async function readableToBuffer(readable: NodeJS.ReadableStream): Promise<Buffer> {
-  const chunks = [];
+  const chunks: Array<Buffer> = [];
   for await (const chunk of readable) {
-    chunks.push(chunk);
+    chunks.push(chunk as Buffer);
   }
   return Buffer.concat(chunks);
 }
