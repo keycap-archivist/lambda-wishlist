@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    // "strict": true,
-    "target": "es2018",
+    "strict": true,
+    "target": "ESNext",
     "module": "commonjs",
     "removeComments": true,
     "sourceMap": true,

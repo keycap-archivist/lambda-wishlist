@@ -11,7 +11,7 @@ import type { ColorwayDetailed } from '../db/instance';
 import type { Image, CanvasRenderingContext2D } from 'canvas';
 import type { FastifyLoggerInstance } from 'fastify';
 
-export const supportedFonts = [];
+export const supportedFonts: Array<string> = [];
 const client = new S3({ region: 'us-east-2' });
 
 export interface cap {
@@ -400,31 +400,6 @@ async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
   const out = await readableToBuffer(data.Body as NodeJS.ReadableStream);
   return out;
 }
-
-// export async function resizeImg(imgBuffer: Buffer): Promise<Buffer> {
-//   const IMG_HEIGTH = 500;
-//   const IMG_WIDTH = 500;
-//   const _img = await loadImage(imgBuffer);
-
-//   let h: number, w: number, sx: number, sy: number;
-//   if (_img.width > _img.height) {
-//     h = _img.height;
-//     w = h;
-//     sy = 0;
-//     sx = Math.ceil((_img.width - _img.height) / 2);
-//   } else {
-//     sx = 0;
-//     sy = Math.ceil((_img.height - _img.width) / 2);
-//     w = _img.width;
-//     h = w;
-//   }
-//   const Tcanvas = createCanvas(IMG_WIDTH, IMG_HEIGTH);
-//   const Tctx = Tcanvas.getContext('2d');
-
-//   Tctx.drawImage(_img, sx, sy, w, h, 0, 0, IMG_WIDTH, IMG_HEIGTH);
-
-//   return Tcanvas.toBuffer('image/jpeg', { quality: 1, progressive: true, chromaSubsampling: false });
-// }
 
 export function isTextFittingSpace(
   ctx: CanvasRenderingContext2D,

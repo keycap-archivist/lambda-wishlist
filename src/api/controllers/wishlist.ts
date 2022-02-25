@@ -8,7 +8,7 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
   try {
     const imgBuffer = await generateWishlist(req.log, req.body);
     if (!imgBuffer.isError) {
-      if (req.headers.accept.includes('image/png')) {
+      if (req.headers.accept && req.headers.accept.includes('image/png')) {
         return resp
           .status(200)
           .header('Content-Disposition', 'attachment; filename="wishlist.png"')
@@ -22,7 +22,7 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
             'Content-Type': `image/png`
           },
           IsBase64Encoded: true,
-          Body: imgBuffer.result.toString('base64')
+          Body: imgBuffer.result ? imgBuffer.result.toString('base64') : undefined
         });
       }
     }
@@ -42,7 +42,7 @@ export const checkWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, r
   try {
     const result = {
       hasError: false,
-      errors: []
+      errors: [] as Array<string>
     };
     for (const c of req.body.caps) {
       if (instance.getColorway(c.id) === undefined) {
