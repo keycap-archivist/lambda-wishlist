@@ -70,7 +70,9 @@ interface sanitizedWishlist {
   settings: wishlistSetting;
 }
 
-interface hydratedWishlistCap extends ColorwayDetailed, wishlistCap {}
+interface hydratedWishlistCap extends ColorwayDetailed, wishlistCap {
+  imgBuffer?: Buffer
+}
 
 const defaultWishlistSettings: wishlistSetting = Object.freeze({
   capsPerLine: 3,
@@ -125,8 +127,12 @@ async function drawTheCap(
   x: number,
   y: number
 ): Promise<void> {
-  const imgBuffer = await getImgBuffer(cap);
-  const _img = await loadImage(imgBuffer);
+  let _img: Image;
+  if (cap.imgBuffer) {
+    _img = await loadImage(cap.imgBuffer);
+  } else {
+    throw new Error('No imgBuffer')
+  }
 
   let h: number, w: number, sx: number, sy: number;
   if (_img.width > _img.height) {
@@ -280,6 +286,25 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   let y = HEADER_HEIGHT;
   let idx = 0;
+
+  const timeGetFiles = process.hrtime()
+  const getBuffersPromises = []
+  for (const cap of w.caps as Array<hydratedWishlistCap>) {
+    getBuffersPromises.push(getImgBuffer(cap).then(b =>
+      cap.imgBuffer = b
+    ))
+  }
+  for (const cap of w.tradeCaps as Array<hydratedWishlistCap>) {
+    getBuffersPromises.push(getImgBuffer(cap).then(b =>
+      cap.imgBuffer = b
+    ))
+  }
+  await Promise.all(getBuffersPromises)
+  const diffGetFiles = process.hrtime(timeGetFiles);
+  const durationGetFiles = readableHRTimeMs(diffGetFiles);
+
+  appLogger.info(`generateWishlist-v2 getFiles %d caps %d ms`, w.caps.length, durationGetFiles);
+
   for (const cap of w.caps) {
     if (idx === w.settings.capsPerLine) {
       idx = 0;
@@ -395,7 +420,7 @@ export function initImgProcessor(): void {
   }
 }
 
-async function getImgBuffer(colorway: ColorwayDetailed): Promise<Buffer> {
+async function getImgBuffer(colorway: { id: string }): Promise<Buffer> {
   const data = await client.getObject({ Bucket: 'cdn.keycap-archivist.com', Key: `keycaps/250/${colorway.id}.jpg` });
   const out = await readableToBuffer(data.Body as NodeJS.ReadableStream);
   return out;
