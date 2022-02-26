@@ -71,7 +71,7 @@ interface sanitizedWishlist {
 }
 
 interface hydratedWishlistCap extends ColorwayDetailed, wishlistCap {
-  imgBuffer?: Buffer
+  imgBuffer?: Buffer;
 }
 
 const defaultWishlistSettings: wishlistSetting = Object.freeze({
@@ -131,7 +131,7 @@ async function drawTheCap(
   if (cap.imgBuffer) {
     _img = await loadImage(cap.imgBuffer);
   } else {
-    throw new Error('No imgBuffer')
+    throw new Error('No imgBuffer');
   }
 
   let h: number, w: number, sx: number, sy: number;
@@ -287,19 +287,15 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
   let y = HEADER_HEIGHT;
   let idx = 0;
 
-  const timeGetFiles = process.hrtime()
-  const getBuffersPromises = []
+  const timeGetFiles = process.hrtime();
+  const getBuffersPromises = [];
   for (const cap of w.caps as Array<hydratedWishlistCap>) {
-    getBuffersPromises.push(getImgBuffer(cap).then(b =>
-      cap.imgBuffer = b
-    ))
+    getBuffersPromises.push(getImgBuffer(cap).then((b) => (cap.imgBuffer = b)));
   }
   for (const cap of w.tradeCaps as Array<hydratedWishlistCap>) {
-    getBuffersPromises.push(getImgBuffer(cap).then(b =>
-      cap.imgBuffer = b
-    ))
+    getBuffersPromises.push(getImgBuffer(cap).then((b) => (cap.imgBuffer = b)));
   }
-  await Promise.all(getBuffersPromises)
+  await Promise.all(getBuffersPromises);
   const diffGetFiles = process.hrtime(timeGetFiles);
   const durationGetFiles = readableHRTimeMs(diffGetFiles);
 
