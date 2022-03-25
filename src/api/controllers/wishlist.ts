@@ -67,11 +67,11 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
   }
 };
 
-export const getWishlistSettings = async (_: FastifyRequest, resp: FastifyReply): Promise<void> => {
-  return resp.type('application/json').status(200).send({ fonts: supportedFonts });
+export const getWishlistSettings = (_: FastifyRequest, resp: FastifyReply): void => {
+  resp.type('application/json').status(200).send({ fonts: supportedFonts });
 };
 
-export const checkWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): Promise<void> => {
+export const checkWishlist = (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): void => {
   try {
     const result = {
       hasError: false,
@@ -91,9 +91,9 @@ export const checkWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, r
         }
       }
     }
-    return resp.status(200).send(result);
+    resp.status(200).send(result);
   } catch (e) {
     req.log.error(e);
-    return resp.status(500).send('Oops! An error has occured');
+    resp.status(500).send('Oops! An error has occured');
   }
 };
