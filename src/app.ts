@@ -41,13 +41,13 @@ app.route({
       $ref: '#wishlist'
     }
   },
-  handler: checkWishlist
+  handler: checkWishlist as () => void
 });
 
 app.route({
   method: 'GET',
   url: '/wishlist/settings',
-  handler: getWishlistSettings
+  handler: getWishlistSettings as () => void
 });
 
 if (require.main === module) {
