@@ -48,36 +48,27 @@ export const postWishlist = async (req: FastifyRequest<{ Body: wishlistV2 }>, re
           .header('Content-Type', 'image/png')
           .send(imgBuffer.result);
       } else {
-        return resp
-          .status(200)
-          .send({
-            StatusCode: 200,
-            Headers: {
-              'Content-Disposition': `attachment; filename="wishlist.png"`,
-              'Content-Type': `image/png`
-            },
-            IsBase64Encoded: true,
-            Body: imgBuffer.result ? imgBuffer.result.toString('base64') : undefined
-          });
+        return resp.status(200).send({
+          StatusCode: 200,
+          Headers: {
+            'Content-Disposition': `attachment; filename="wishlist.png"`,
+            'Content-Type': `image/png`
+          },
+          IsBase64Encoded: true,
+          Body: imgBuffer.result ? imgBuffer.result.toString('base64') : undefined
+        });
       }
     }
 
-    return resp
-      .status(500)
-      .send('Oops! An error has occured');
+    return resp.status(500).send('Oops! An error has occured');
   } catch (e) {
     req.log.error(e);
-    return resp
-      .status(500)
-      .send('Oops! An error has occured');
+    return resp.status(500).send('Oops! An error has occured');
   }
 };
 
 export const getWishlistSettings = (_: FastifyRequest, resp: FastifyReply): unknown => {
-  return resp
-    .type('application/json')
-    .status(200)
-    .send({ fonts: supportedFonts });
+  return resp.type('application/json').status(200).send({ fonts: supportedFonts });
 };
 
 export const checkWishlist = (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): unknown => {
@@ -100,13 +91,9 @@ export const checkWishlist = (req: FastifyRequest<{ Body: wishlistV2 }>, resp: F
         }
       }
     }
-    return resp
-      .status(200)
-      .send(result);
+    return resp.status(200).send(result);
   } catch (e) {
     req.log.error(e);
-    return resp
-      .status(500)
-      .send('Oops! An error has occured');
+    return resp.status(500).send('Oops! An error has occured');
   }
 };
