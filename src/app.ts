@@ -1,5 +1,5 @@
 import fastify from 'fastify';
-import fastifyCORS from 'fastify-cors';
+import fastifyCORS from '@fastify/cors';
 import pino from 'pino';
 
 import { postWishlist, getWishlistSettings, checkWishlist } from './api/controllers/wishlist';
