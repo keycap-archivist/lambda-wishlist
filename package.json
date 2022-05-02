@@ -19,7 +19,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "3.56.0",
     "@aws-sdk/client-timestream-write": "3.56.0",
-    "@fastify/cors": "^7.0.0",
+    "@fastify/cors": "7.0.0",
     "aws-lambda-fastify": "2.1.2",
     "canvas": "2.9.1",
     "fastify": "3.27.4",
