@@ -959,6 +959,11 @@
   dependencies:
     ajv "^6.12.6"
 
+"@fastify/aws-lambda@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@fastify/aws-lambda/-/aws-lambda-3.0.0.tgz#c7ad02b9e47054247aef971a7998a3b9fff6126d"
+  integrity sha512-VQkOhKJ68Ol0XcP5dO7waoOgQ/iK1ymCl8llNV9piZ56CsTo8uhKJctCBYWBQGhhR6fqjtswl2g23aEqrrOnlw==
+
 "@fastify/cors@7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@fastify/cors/-/cors-7.0.0.tgz#c67c5a5909498b696bb19578e903f36037ac6f32"
