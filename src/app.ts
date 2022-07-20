@@ -8,7 +8,7 @@ import { build as buildSchemas } from './internal/schemas';
 import { initImgProcessor } from './internal/image-processor-v2';
 
 const GIT_REV = process.env.GIT_REVISION;
-const logger = pino().child({ revision: GIT_REV });
+const logger = pino(pino.destination({ sync: true })).child({ revision: GIT_REV });
 const app = fastify({ logger, exposeHeadRoutes: true, pluginTimeout: 20000 });
 
 buildSchemas(app);
@@ -51,7 +51,7 @@ app.route({
 });
 
 if (require.main === module) {
-  app.listen(3001, '0.0.0.0', (err) => {
+  app.listen({port:3001,host:'0.0.0.0'}, (err) => {
     if (err) console.error(err);
   });
 }
