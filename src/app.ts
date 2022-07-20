@@ -51,7 +51,7 @@ app.route({
 });
 
 if (require.main === module) {
-  app.listen({port:3001,host:'0.0.0.0'}, (err) => {
+  app.listen({ port: 3001, host: '0.0.0.0' }, (err) => {
     if (err) console.error(err);
   });
 }
