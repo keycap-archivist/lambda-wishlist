@@ -29,6 +29,9 @@ async function metrics(wl: wishlistV2, log: FastifyLoggerInstance) {
         ]
       });
     }
+    if (!recs.length) {
+      return;
+    }
     const command = new WriteRecordsCommand({ DatabaseName: 'keycap-archivist', TableName: 'wishlist', Records: recs });
     const res = await client.send(command);
     log.info(`${res.RecordsIngested?.Total} Metrics properly sent`);
