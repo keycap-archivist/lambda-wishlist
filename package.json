@@ -25,7 +25,7 @@
     "canvas": "2.9.3",
     "fastify": "4.3.0",
     "lodash": "4.17.21",
-    "pino": "8.3.0"
+    "pino": "8.3.1"
   },
   "devDependencies": {
     "@types/lodash": "4.14.182",
