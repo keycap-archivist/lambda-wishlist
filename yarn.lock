@@ -969,10 +969,10 @@
     ajv-formats "^2.1.1"
     fast-uri "^2.0.0"
 
-"@fastify/aws-lambda@3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@fastify/aws-lambda/-/aws-lambda-3.0.0.tgz#c7ad02b9e47054247aef971a7998a3b9fff6126d"
-  integrity sha512-VQkOhKJ68Ol0XcP5dO7waoOgQ/iK1ymCl8llNV9piZ56CsTo8uhKJctCBYWBQGhhR6fqjtswl2g23aEqrrOnlw==
+"@fastify/aws-lambda@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@fastify/aws-lambda/-/aws-lambda-3.1.0.tgz#24caabca8da2dca97c52ec1a497679ecf11ad851"
+  integrity sha512-DshyhmEPwm8IQoSd6mzOdeA53ms8EaxGWydGlItB1YHII0VCnfwfDYAFdGVn3eBwq0m4FKBc9W+sp3MRvqHHaA==
 
 "@fastify/cors@8.0.0":
   version "8.0.0"
