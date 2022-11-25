@@ -75,28 +75,30 @@ export const getWishlistSettings = (_: FastifyRequest, resp: FastifyReply): unkn
 };
 
 export const textWishlist = (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): unknown => {
-  const content: string[] = []
+  const content: string[] = [];
 
   if (req.body.tradeCaps?.length) {
-    content.push(`[H]`)
+    content.push(`[H]`);
     for (const c of req.body.tradeCaps) {
-      const hydratedCap = instance.getColorway(c.id)
-      if (!hydratedCap) { continue }
-      content.push(`${hydratedCap.sculpt.artist.name} - ${hydratedCap.sculpt.name} - ${hydratedCap.name}`)
+      const hydratedCap = instance.getColorway(c.id);
+      if (!hydratedCap) {
+        continue;
+      }
+      content.push(`${hydratedCap.sculpt.artist.name} - ${hydratedCap.sculpt.name} - ${hydratedCap.name}`);
     }
   }
-  content.push('')
-  content.push(`[W]`)
+  content.push('');
+  content.push(`[W]`);
   for (const c of req.body.caps) {
-    const hydratedCap = instance.getColorway(c.id)
-    if (!hydratedCap) { continue }
-    content.push(`${hydratedCap.sculpt.artist.name} - ${hydratedCap.sculpt.name} - ${hydratedCap.name}`)
+    const hydratedCap = instance.getColorway(c.id);
+    if (!hydratedCap) {
+      continue;
+    }
+    content.push(`${hydratedCap.sculpt.artist.name} - ${hydratedCap.sculpt.name} - ${hydratedCap.name}`);
   }
 
-  return resp.status(200)
-    .header('Content-Type', 'text/plain')
-    .send(content.join('\n'))
-}
+  return resp.status(200).header('Content-Type', 'text/plain').send(content.join('\n'));
+};
 
 export const checkWishlist = (req: FastifyRequest<{ Body: wishlistV2 }>, resp: FastifyReply): unknown => {
   try {
