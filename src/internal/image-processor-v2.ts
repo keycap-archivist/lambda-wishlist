@@ -1,15 +1,15 @@
-import { createCanvas, loadImage, registerFont } from 'canvas';
-import { merge, cloneDeep } from 'lodash';
-import { readFileSync, readdirSync } from 'fs';
-import { join, resolve } from 'path';
 import { S3 } from '@aws-sdk/client-s3';
+import { createCanvas, loadImage, registerFont } from 'canvas';
+import { readdirSync, readFileSync } from 'fs';
+import { cloneDeep, merge } from 'lodash';
+import { join, resolve } from 'path';
 
 import { instance } from '../db/instance';
 import { readableHRTimeMs, readableToBuffer } from '../internal/utils';
 
-import type { ColorwayDetailed } from '../db/instance';
-import type { Image, CanvasRenderingContext2D } from 'canvas';
+import type { CanvasRenderingContext2D, Image } from 'canvas';
 import type { FastifyLoggerInstance } from 'fastify';
+import type { ColorwayDetailed } from '../db/instance';
 
 export const supportedFonts: Array<string> = [];
 const client = new S3({ region: 'us-east-2' });
@@ -261,12 +261,6 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
     })
     .filter(Boolean) as wishlistCap[];
 
-  // If no caps founds means that ids are wrong and wishlist can't be generated
-  if (!w.caps.length) {
-    appLogger.error('No caps found for the wishlist');
-    return { isError: true };
-  }
-
   w.tradeCaps = w.tradeCaps
     .map((c) => {
       const hydratedCap = instance.getColorway(c.id);
@@ -275,6 +269,12 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
       }
     })
     .filter(Boolean) as cap[];
+
+  // If no caps founds means that ids are wrong and wishlist can't be generated
+  if (!w.caps.length && !w.tradeCaps.length) {
+    appLogger.error('No caps found for the wishlist');
+    return { isError: true };
+  }
   const p = [];
   const canvasHeight = calcHeight(w as sanitizedWishlist);
   const canvasWidth = calcWidth(w.settings.capsPerLine);
@@ -301,12 +301,16 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
 
   appLogger.info(`generateWishlist-v2 getFiles %d caps %d ms`, w.caps.length, durationGetFiles);
 
-  for (const cap of w.caps) {
-    if (idx === w.settings.capsPerLine) {
-      idx = 0;
-      y += rowHeight;
+  if (w.caps.length) {
+    for (const cap of w.caps) {
+      if (idx === w.settings.capsPerLine) {
+        idx = 0;
+        y += rowHeight;
+      }
+      p.push(
+        drawTheCap(ctx, w.settings, cap as hydratedWishlistCap, idx++ * (IMG_WIDTH + MARGIN_SIDE) + MARGIN_SIDE, y)
+      );
     }
-    p.push(drawTheCap(ctx, w.settings, cap as hydratedWishlistCap, idx++ * (IMG_WIDTH + MARGIN_SIDE) + MARGIN_SIDE, y));
   }
 
   await Promise.all(p);
