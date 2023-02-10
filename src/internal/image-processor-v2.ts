@@ -307,7 +307,9 @@ export async function generateWishlist(appLogger: FastifyLoggerInstance, w: wish
         idx = 0;
         y += rowHeight;
       }
-      p.push(drawTheCap(ctx, w.settings, cap as hydratedWishlistCap, idx++ * (IMG_WIDTH + MARGIN_SIDE) + MARGIN_SIDE, y));
+      p.push(
+        drawTheCap(ctx, w.settings, cap as hydratedWishlistCap, idx++ * (IMG_WIDTH + MARGIN_SIDE) + MARGIN_SIDE, y)
+      );
     }
   }
 
