@@ -10,6 +10,9 @@ RUN yarn build
 
 FROM node:18.12.0-buster
 
+# ref: https://github.com/aws/aws-lambda-nodejs-runtime-interface-client/issues/56
+ENV HOME="/tmp"
+
 ARG FUNCTION_DIR
 ARG GIT_REV
 RUN apt-get update
@@ -31,7 +34,7 @@ ENV GIT_REVISION=${GIT_REV}
 COPY --from=build-img /src/dist ${FUNCTION_DIR}
 COPY --from=build-img /src/package.json ${FUNCTION_DIR}/package.json
 RUN yarn --production --frozen-lockfile
-RUN yarn add aws-lambda-ric@2.1.0
+RUN yarn add aws-lambda-ric
 
 
 ENTRYPOINT ["/usr/local/bin/npx", "aws-lambda-ric"]
