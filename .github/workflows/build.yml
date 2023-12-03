@@ -36,7 +36,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
       - name: Build Docker Image
-        run: docker build --build-arg GIT_REV=${{ github.sha }} -t lambda_wishlist:latest .
+        run: |
+          docker build \
+          --platform linux/amd64 \
+          --build-arg GIT_REV=${{ github.sha }} \
+          -t lambda_wishlist:latest .
       - name: Push to ECR
         if: github.ref == 'refs/heads/main'
         run: |
