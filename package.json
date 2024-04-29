@@ -22,7 +22,7 @@
     "@fastify/aws-lambda": "3.2.0",
     "@fastify/cors": "8.2.0",
     "aws-lambda-fastify": "2.2.0",
-    "canvas": "2.11.0",
+    "canvas": "2.11.2",
     "fastify": "4.11.0",
     "lodash": "4.17.21",
     "pino": "8.19.0"
